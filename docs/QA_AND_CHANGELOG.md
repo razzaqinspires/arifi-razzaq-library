@@ -64,3 +64,25 @@
 ## v0.1.0 — Initial Creator Library MVP
 
 - First creator landing page, searchable category library, detail page, download redirect, likes, rating, comments, admin login, release create/delete, and PostgreSQL schema.
+
+
+## v0.2.1 — 2026-11-08 — Vercel build hotfix
+
+### Problem
+Vercel `next build` failed during page-data collection for `/api/admin/comments/[id]` because `lib/db.ts` threw when `DATABASE_URL` was absent at module import time. Next.js imports route modules during build analysis; a runtime-only secret must not be required at import time.
+
+### Changes
+- `lib/db.ts`: replaced eager Pool construction with a lazy `getPool()` initializer and a typed lazy proxy. Importing the database module is now safe during build-time route analysis. The first actual database operation still requires `DATABASE_URL` and produces a clear configuration error if it is missing.
+- `package.json`: bumped package version from `0.2.0` to `0.2.1`.
+
+### Operational impact
+- Configure `DATABASE_URL` in Vercel Project Settings → Environment Variables for Preview and Production (and Development if needed). Redeploy after saving it.
+- Configure `DATABASE_SSL` only when required by the PostgreSQL provider.
+- This change does not create or migrate the database and does not change the schema. Existing data is preserved.
+
+### Verification
+- Static inspection confirms `lib/db.ts` no longer reads `DATABASE_URL` or constructs `pg.Pool` during module import.
+- Full Vercel build and live database operations must be confirmed by the next deployment, because this workspace does not contain the deployment's PostgreSQL credentials.
+
+### Rollback
+Revert the `lib/db.ts` and `package.json` changes to the previous commit if necessary. No database migration or data rollback is required.

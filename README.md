@@ -115,3 +115,8 @@ Saat ini file konten masih disimpan pada layanan eksternal; website menyimpan UR
 ## Status implementasi
 
 **v0.2.0 — Soft Professional Redesign.** Source sudah diperbarui dan pemeriksaan sintaks statis dilakukan. Instalasi dependency terhenti karena registry tidak merespons dalam batas waktu sesi ini, sehingga `npm run lint`, `npm run typecheck` lengkap, `npm run build`, uji browser, dan integrasi PostgreSQL belum dapat dikonfirmasi. Lihat [QA_AND_CHANGELOG.md](docs/QA_AND_CHANGELOG.md) sebelum deploy.
+
+
+## Latest hotfix — v0.2.1
+
+This release fixes Vercel build-time failure caused by eager PostgreSQL initialization. Database connection creation is now lazy and occurs on the first database operation. See [QA and Changelog](docs/QA_AND_CHANGELOG.md) for details and deployment instructions. Ensure `DATABASE_URL` is configured in Vercel for the target environment before using database-backed features.
