@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { query } from "@/lib/db";
 import { isAdmin, validHttpUrl } from "@/lib/http";
 import type { ReleaseInput } from "@/lib/types";
 
@@ -28,7 +28,7 @@ export async function PUT(request: Request, context: Context) {
     const tags = Array.isArray(data.tags) ? data.tags.filter((v): v is string => typeof v === "string").map((v) => v.trim().slice(0, 32)).filter(Boolean).slice(0, 16) : [];
     const changelog = Array.isArray(data.changelog) ? data.changelog.filter((v): v is string => typeof v === "string").map((v) => v.trim().slice(0, 300)).filter(Boolean).slice(0, 40) : [];
 
-    const result = await db.query(
+    const result = await query(
       `UPDATE releases SET title = $1, slug = $2, short_description = $3, description = $4,
        category = $5, version = $6, file_size = $7, file_name = $8, download_url = $9,
        video_url = $10, thumbnail_url = $11, tags = $12, changelog = $13,
@@ -53,7 +53,7 @@ export async function DELETE(_request: Request, context: Context) {
   const { id } = await context.params;
   if (!/^\d+$/.test(id)) return Response.json({ error: "ID tidak valid." }, { status: 400 });
   try {
-    const result = await db.query("DELETE FROM releases WHERE id = $1 RETURNING id", [id]);
+    const result = await query("DELETE FROM releases WHERE id = $1 RETURNING id", [id]);
     if (!result.rowCount) return Response.json({ error: "Konten tidak ditemukan." }, { status: 404 });
     return Response.json({ ok: true });
   } catch (error) {

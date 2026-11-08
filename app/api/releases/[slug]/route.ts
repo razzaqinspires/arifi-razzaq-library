@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { query } from "@/lib/db";
 import { getVisitorId } from "@/lib/visitor";
 
 export const runtime = "nodejs";
@@ -8,7 +8,7 @@ type Context = { params: Promise<{ slug: string }> };
 export async function GET(_request: Request, context: Context) {
   const { slug } = await context.params;
   try {
-    const release = await db.query(
+    const release = await query(
       `SELECT r.id::int AS id, r.title, r.slug, r.short_description AS "shortDescription", r.description,
               r.category, r.version, r.file_size AS "fileSize", r.file_name AS "fileName",
               r.download_url AS "downloadUrl", r.video_url AS "videoUrl",
@@ -27,10 +27,10 @@ export async function GET(_request: Request, context: Context) {
     if (!release.rowCount) return Response.json({ error: "Konten tidak ditemukan." }, { status: 404 });
     const visitorId = await getVisitorId();
     const [viewerLike, viewerRating] = await Promise.all([
-      db.query("SELECT 1 FROM release_likes WHERE release_id = $1 AND visitor_id = $2", [release.rows[0].id, visitorId]),
-      db.query("SELECT score FROM release_ratings WHERE release_id = $1 AND visitor_id = $2", [release.rows[0].id, visitorId]),
+      query("SELECT 1 FROM release_likes WHERE release_id = $1 AND visitor_id = $2", [release.rows[0].id, visitorId]),
+      query("SELECT score FROM release_ratings WHERE release_id = $1 AND visitor_id = $2", [release.rows[0].id, visitorId]),
     ]);
-    const comments = await db.query(
+    const comments = await query(
       `SELECT id::int AS id, name, body, created_at AS "createdAt"
        FROM release_comments WHERE release_id = $1 AND status = 'approved'
        ORDER BY created_at DESC LIMIT 100`,

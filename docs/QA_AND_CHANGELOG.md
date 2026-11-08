@@ -86,3 +86,13 @@ Vercel `next build` failed during page-data collection for `/api/admin/comments/
 
 ### Rollback
 Revert the `lib/db.ts` and `package.json` changes to the previous commit if necessary. No database migration or data rollback is required.
+
+
+## v0.2.2 — Database query initialization hotfix
+
+- Replaced the exported `db` Proxy with a plain async `query()` function.
+- Updated all API route handlers to call `query()` only inside request handlers.
+- This prevents Next.js route export/configuration inspection from triggering database initialization through Proxy property access.
+- Added `scripts/publish-vercel.sh` to validate version/branch, commit changes or create a deployment-trigger commit, push `main`, and verify the remote SHA.
+- Required Vercel runtime setting remains `DATABASE_URL`; this value is required when database-backed APIs are called, not during build-time module import.
+- QA limitation: dependency installation and production build must be run in the user's environment/Vercel; no successful Vercel deployment is claimed by this archive.

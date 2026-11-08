@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { query } from "@/lib/db";
 import { isAdmin } from "@/lib/http";
 
 type Context = { params: Promise<{ id: string }> };
@@ -9,7 +9,7 @@ export async function DELETE(_request: Request, context: Context) {
   const { id } = await context.params;
   if (!/^\d+$/.test(id)) return Response.json({ error: "ID tidak valid." }, { status: 400 });
   try {
-    await db.query("DELETE FROM release_comments WHERE id = $1", [id]);
+    await query("DELETE FROM release_comments WHERE id = $1", [id]);
     return Response.json({ ok: true });
   } catch (error) {
     console.error("[admin delete comment]", error);

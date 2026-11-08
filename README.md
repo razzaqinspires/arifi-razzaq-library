@@ -120,3 +120,8 @@ Saat ini file konten masih disimpan pada layanan eksternal; website menyimpan UR
 ## Latest hotfix — v0.2.1
 
 This release fixes Vercel build-time failure caused by eager PostgreSQL initialization. Database connection creation is now lazy and occurs on the first database operation. See [QA and Changelog](docs/QA_AND_CHANGELOG.md) for details and deployment instructions. Ensure `DATABASE_URL` is configured in Vercel for the target environment before using database-backed features.
+
+
+## v0.2.2 deployment hotfix
+
+This release removes the lazy `db` Proxy and exports a plain `query()` function. API handlers now initialize PostgreSQL only when they execute a request query. To publish from the repository root, run `bash scripts/publish-vercel.sh`; it validates v0.2.2, pushes `main`, and prints the exact commit SHA Vercel must build. Configure `DATABASE_URL` in Vercel for runtime API use.

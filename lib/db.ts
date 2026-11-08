@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, type QueryResult, type QueryResultRow } from "pg";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -30,12 +30,14 @@ function getPool(): Pool {
   return pool;
 }
 
-// Lazy proxy: importing this module is safe during build-time route analysis.
-// Pool methods are bound to the real Pool instance when first accessed.
-export const db = new Proxy({} as Pool, {
-  get(_target, property) {
-    const pool = getPool();
-    const value = Reflect.get(pool, property, pool) as unknown;
-    return typeof value === "function" ? value.bind(pool) : value;
-  },
-});
+// Export a plain function instead of a Proxy. Next.js may inspect imported
+// module exports while collecting route configuration during `next build`.
+// A Proxy can receive property reads during that phase and accidentally
+// initialize the database before runtime. This function only calls getPool()
+// when a request handler actually executes a query.
+export async function query<R extends QueryResultRow = QueryResultRow>(
+  text: string,
+  values?: unknown[],
+): Promise<QueryResult<R>> {
+  return getPool().query<R>(text, values as unknown[]);
+}

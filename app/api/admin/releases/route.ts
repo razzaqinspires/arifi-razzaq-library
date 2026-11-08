@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { query } from "@/lib/db";
 import { isAdmin, validHttpUrl } from "@/lib/http";
 import type { ReleaseInput } from "@/lib/types";
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     if (thumbnailUrl && !validHttpUrl(thumbnailUrl)) return Response.json({ error: "URL thumbnail harus berupa http atau https." }, { status: 400 });
     const tags = Array.isArray(data.tags) ? data.tags.filter((v): v is string => typeof v === "string").map((v) => v.trim().slice(0, 32)).filter(Boolean).slice(0, 16) : [];
     const changelog = Array.isArray(data.changelog) ? data.changelog.filter((v): v is string => typeof v === "string").map((v) => v.trim().slice(0, 300)).filter(Boolean).slice(0, 40) : [];
-    const result = await db.query(
+    const result = await query(
       `INSERT INTO releases (title, slug, short_description, description, category, version,
        file_size, file_name, download_url, video_url, thumbnail_url, tags, changelog, featured)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)

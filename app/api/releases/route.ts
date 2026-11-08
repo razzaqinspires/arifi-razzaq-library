@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { query } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       where.push(`r.category = $${values.length}`);
     }
     const clause = where.length ? `WHERE ${where.join(" AND ")}` : "";
-    const result = await db.query(
+    const result = await query(
       `SELECT r.id::int AS id, r.title, r.slug, r.short_description AS "shortDescription", r.category,
               r.version, r.file_size AS "fileSize", r.thumbnail_url AS "thumbnailUrl",
               r.featured, r.downloads::int AS downloads, r.created_at AS "createdAt",
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
        ORDER BY ${orderBy}`,
       values,
     );
-    const categories = await db.query("SELECT DISTINCT category FROM releases ORDER BY category ASC");
+    const categories = await query("SELECT DISTINCT category FROM releases ORDER BY category ASC");
     return Response.json({ releases: result.rows, categories: categories.rows.map((row) => row.category) });
   } catch (error) {
     console.error("[GET /api/releases]", error);
