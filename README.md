@@ -1,52 +1,80 @@
-# Arifi Razzaq Official — Creator Library
+# Arifi Razzaq — Worklog & Public Library
 
-**Versi: 0.2.0** · Next.js 16 · React 19 · TypeScript · PostgreSQL
+**Versi: 0.3.0** · Next.js 16 · React 19 · TypeScript · PostgreSQL
 
-Website katalog dan pusat informasi untuk konten channel **Arifi Razzaq Official**. Situs ini mengelompokkan project coding, bot, aplikasi, tools, tutorial, dan pembaruan dalam halaman detail yang mempunyai informasi versi, changelog, video terkait, tautan unduhan, statistik komunitas, rating, dan komentar.
+Ruang publik untuk mendokumentasikan karya digital, proses kerja, pembelajaran, eksperimen, dan diskusi komunitas. Website ini mengembangkan Creator Library awal menjadi tiga area yang saling melengkapi:
 
-## Arah desain v0.2.0
+1. **Library** — source code, script, bot, aplikasi, tools, modifikasi buatan sendiri, dan berkas rilis yang memang siap dibagikan.
+2. **Jurnal Kerja** — catatan pengembangan, eksperimen, troubleshooting, pembelajaran, serta proses di balik sebuah project.
+3. **Ruang Komunitas** — post diskusi, pertanyaan, pertukaran pengalaman, dan komentar pembaca.
 
-Antarmuka diperbarui dari dark/gold yang kontras menjadi tampilan **soft professional**: dasar off-white, permukaan putih, aksen sage yang diredam, border halus, radius konsisten, dan bayangan tipis. Tidak ada dependency font atau UI eksternal untuk tampilan utama. Layout desktop, tablet, dan ponsel memiliki komposisi berbeda agar kartu, filter, detail, dan panel admin tetap mudah dipakai.
+Konten publik tidak dimaksudkan sebagai salinan catatan internal bisnis. Jangan publikasikan modal, data pribadi, kredensial, token, password, konfigurasi privat, atau informasi pihak lain tanpa izin.
 
-## Fitur
+## Yang berubah pada v0.3.0
 
-- Homepage berbahasa Indonesia dengan identitas Arifi Razzaq Official dan tautan channel YouTube.
-- Library publik dengan pencarian judul, deskripsi, versi, slug, dan tags.
-- Filter kategori serta urutkan konten berdasarkan terbaru, download, likes, atau rating.
-- Kartu rilis responsif, featured marker, cover thumbnail, versi, ukuran file, dan statistik.
-- Detail rilis: deskripsi, versi, kategori, nama dan ukuran file, tags, changelog, video YouTube, serta tombol download.
-- Like dan rating 1–5 per browser cookie anonim.
-- Komentar publik dan moderasi hapus komentar dari Creator Studio.
-- Creator Studio: login admin, tambah rilis, edit rilis, hapus rilis, statistik unduhan, dan moderasi komentar.
-- Endpoint download mencatat permintaan dan mengarahkan pengunjung ke URL file eksternal.
-- PostgreSQL sebagai penyimpanan permanen.
+- Mempertahankan katalog file, halaman detail rilis, download tracking, like, rating, komentar, dan Creator Studio yang sudah ada.
+- Menambahkan kategori luas untuk software, bot, web, AI, embedded/robotics/IoT, aplikasi, game modding, open source, tutorial, product development, creative work, dan worklog.
+- Menambahkan **Jurnal Kerja** dan **Ruang Komunitas** sebagai jenis konten terpisah dari rilis yang bisa diunduh.
+- Menambahkan post publik dengan kategori, tags, cover opsional, URL referensi, pilihan featured, status draft/publikasi, dan halaman detail.
+- Menambahkan komentar di setiap post, serta moderasi komentar release dan post dalam Creator Studio.
+- Menyediakan starter posts publik untuk memberi konteks awal: dokumentasi website, Razzaq Adzan Engine, eksperimen WhatsApp bot, embedded systems, eksplorasi AI, pengembangan produk, dan topik diskusi komunitas.
+- Memperluas SEO metadata, navigasi, responsive UI, dan panduan publikasi.
+- Tidak menambahkan dependency runtime baru.
+
+## Struktur konten
+
+| Area | Isi | URL |
+|---|---|---|
+| Library | Downloadable release, source code, tools, apps, scripts | `/` → Library |
+| Jurnal Kerja | Worklog, riset, proses, pelajaran, eksperimen | `/` → Rekam kerja; detail `/posts/[slug]` |
+| Ruang Komunitas | Pertanyaan dan diskusi berbasis post | `/` → Komunitas; detail `/posts/[slug]` |
+| Creator Studio | Kelola release, post, draft, dan komentar | `/admin` |
+
+### Taksonomi Library
+
+- Software & Coding
+- Bot & Automation
+- Web Development
+- AI & Eksperimen
+- Embedded, Robotics & IoT
+- Aplikasi & Tools
+- Game Modding
+- Open Source
+- Tutorial & Edukasi
+- Product Development
+- Creative & Content
+- Worklog & Dokumentasi
+- Riset & Eksperimen
+- Lainnya
+
+Kategori post memiliki cakupan yang serupa, dengan tambahan kategori Catatan Harian dan Diskusi Teknologi. Kategori lama tetap dapat diedit untuk menjaga kompatibilitas data existing.
 
 ## Jalankan lokal
 
 Persyaratan: Node.js 22.16+, npm 10+, dan PostgreSQL 15+.
 
 ```bash
-# 1. Ekstrak ZIP, kemudian masuk ke folder proyek
+# Ekstrak ZIP lalu masuk ke folder proyek
 cd arifi-razzaq-library
 
-# 2. Siapkan konfigurasi; gunakan Neovim untuk mengedit
+# Siapkan environment
 cp .env.example .env
 nvim .env
 
-# 3. Buat database kosong
+# Buat database kosong bila belum ada
 createdb arifi_library
 
-# 4. Pasang dependency dan buat schema awal
+# Install dependency dan siapkan seluruh tabel
 npm install
 npm run db:setup
 
-# 5. Jalankan server lokal
+# Jalankan aplikasi
 npm run dev
 ```
 
 Buka `http://localhost:3000`. Creator Studio berada di `http://localhost:3000/admin`.
 
-Isi `.env` dengan kredensial dan secret milik sendiri:
+Contoh konfigurasi `.env`:
 
 ```dotenv
 DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/arifi_library
@@ -55,40 +83,79 @@ SESSION_SECRET=YOUR_RANDOM_SECRET_AT_LEAST_32_CHARACTERS
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Buat secret sesi menggunakan `openssl rand -base64 48`. Jangan memakai nilai contoh atau commit file `.env`. Untuk database lokal non-SSL saja, `DATABASE_SSL=false` dapat diaktifkan.
+Buat session secret menggunakan `openssl rand -base64 48`. Jangan commit file `.env`, password, session secret, API token, atau cookie. Untuk database lokal non-SSL saja, `DATABASE_SSL=false` dapat diaktifkan.
 
-## Workflow publikasi konten
+## Workflow publikasi
 
-1. Masuk ke `/admin`.
-2. Isi judul, ringkasan, deskripsi, kategori, dan versi.
-3. Masukkan URL file yang bisa diakses publik. Tambahkan URL video YouTube, thumbnail, tags, dan changelog bila tersedia.
-4. Terbitkan. Konten akan muncul pada katalog publik.
-5. Untuk pembaruan, tekan **Edit** pada item di Creator Studio. Ubah versi, detail, file URL, atau changelog lalu simpan.
-6. Periksa halaman detail publik dan tombol unduhan setelah setiap publikasi.
+### Rilis Library
+
+1. Masuk ke `/admin` lalu pilih tab **Library & file**.
+2. Isi judul, ringkasan, deskripsi, kategori, versi, dan URL unduhan.
+3. Tambahkan video, thumbnail, tags, dan changelog bila tersedia.
+4. Pastikan file benar-benar milikmu atau lisensinya memperbolehkan distribusi ulang.
+5. Terbitkan lalu periksa halaman detail dan tautan download.
+
+### Jurnal Kerja dan Ruang Komunitas
+
+1. Pilih tab **Jurnal & post**.
+2. Pilih jenis **Jurnal Kerja**, **Ruang Komunitas / Diskusi**, atau **Pengumuman**.
+3. Isi judul, ringkasan, isi post, kategori, dan tags.
+4. Simpan sebagai draft dengan mematikan opsi publikasi, atau langsung publikasikan.
+5. Halaman post memiliki ruang komentar. Komentar release dan komentar post dapat dimoderasi pada tab Komentar.
+
+Gunakan Jurnal Kerja untuk proses yang sedang berlangsung maupun hasil yang sudah selesai. Jelaskan statusnya dengan jujur—misalnya *eksperimen*, *prototype*, *dalam pengembangan*, atau *rilis stabil*.
+
+## Lisensi
+
+Setiap item yang diterbitkan ke Library harus memiliki keterangan lisensi atau izin distribusi yang sesuai. Repository website ini belum menetapkan lisensi default; sebelum source website ini dibagikan ulang secara open-source, tentukan dan tambahkan file `LICENSE` yang sesuai. Jangan menganggap semua konten yang tampil di website otomatis berlisensi sama.
+
+## Batas publikasi dan hak cipta
+
+- Jangan masukkan rincian modal atau biaya internal, alamat atau data pribadi, nomor telepon privat, password, session, token, secret, akses server, dan dokumen bisnis internal.
+- Jangan membagikan source code milik orang lain, APK/game binary proprietary, aset berbayar, lisensi, atau konten berhak cipta tanpa izin.
+- Untuk konten game modding, utamakan patch, konfigurasi, tutorial, source mod, atau tautan sumber resmi yang legal. Jangan mengemas ulang dan mengedarkan file game/aset komersial tanpa hak distribusi.
+- Beri kredit dan cantumkan lisensi sesuai ketentuan proyek sumber.
+- Hindari klaim berlebihan pada riset eksperimental. Pisahkan hipotesis, pengamatan, hasil uji, dan kesimpulan.
+- Post publik dapat dikomentari pembaca. Jangan mengunggah informasi sensitif pada komentar.
+
+## Arsitektur singkat
+
+- Next.js App Router: halaman publik, API routes, dan Creator Studio.
+- PostgreSQL: tabel `releases` untuk materi unduhan; `posts` untuk jurnal/diskusi; `release_comments` dan `post_comments` untuk komentar; tabel likes/ratings untuk release.
+- Cookie anonim untuk identitas visitor like/rating dan komentar; bukan sistem akun komunitas.
+- Admin berbasis password dan HMAC-signed HTTP-only cookie.
+- File rilis tetap di-host pada layanan eksternal; aplikasi menyimpan URL dan menghitung redirect download.
+- Tidak ada binary storage maupun upload file langsung dalam versi ini.
+
+## Database migration
+
+v0.3.0 memperluas `db/schema.sql` dengan tabel `posts` dan `post_comments`, index, serta starter posts. Tidak ada tabel lama yang dihapus atau kolom rilis yang diubah. Untuk database existing, backup dahulu lalu jalankan:
+
+```bash
+npm run db:setup
+```
+
+Schema menggunakan `CREATE TABLE IF NOT EXISTS` dan starter posts memakai `ON CONFLICT (slug) DO NOTHING`, sehingga aman dijalankan ulang untuk setup tabel dan konten awal. Tetap lakukan backup sebelum perubahan database di production.
 
 ## Struktur file penting
 
 | Path | Fungsi |
 |---|---|
-| `app/page.tsx` | Landing page dan komposisi homepage |
-| `app/globals.css` | Design system, responsive layout, detail, dan admin |
-| `app/layout.tsx` | Metadata SEO, viewport, header dan footer global |
-| `app/library/[slug]/page.tsx` | Route detail setiap rilis |
-| `app/admin/page.tsx` | Route Creator Studio |
-| `components/library-browser.tsx` | Search, kategori, sorting, dan kartu konten |
-| `components/release-detail.tsx` | Detail rilis, download, like, rating, komentar |
-| `components/admin-dashboard.tsx` | Form create/edit, statistik, dan moderasi |
-| `app/api/releases/route.ts` | API list, pencarian, filter, sorting |
-| `app/api/admin/releases/route.ts` | API tambah rilis |
-| `app/api/admin/releases/[id]/route.ts` | API edit dan hapus rilis |
-| `app/api/download/[slug]/route.ts` | Mencatat permintaan unduhan dan redirect |
-| `db/schema.sql` | Tabel rilis, like, rating, dan komentar |
-| `scripts/setup-db.mjs` | Menjalankan schema awal |
-| `lib/auth.ts` | HMAC session admin |
-| `lib/db.ts` | PostgreSQL connection pool |
-| `docs/` | Arsitektur, setup, keamanan, QA, dan changelog |
+| `app/page.tsx` | Homepage, Library, Jurnal Kerja, dan Komunitas |
+| `app/posts/[slug]/page.tsx` | Halaman detail post |
+| `components/library-browser.tsx` | Katalog rilis dan filter kategori |
+| `components/post-browser.tsx` | Feed jurnal, post komunitas, pencarian dan filter |
+| `components/post-detail.tsx` | Konten post dan diskusi/komentar |
+| `components/admin-dashboard.tsx` | CRUD release/post dan moderasi komentar |
+| `app/api/posts/` | API post publik dan komentar |
+| `app/api/admin/posts/` | API CRUD post khusus admin |
+| `app/api/admin/post-comments/` | API moderasi komentar post |
+| `db/schema.sql` | Schema release, post, engagement, dan komentar |
+| `lib/content.ts` | Taksonomi kategori dan label jenis post |
+| `lib/post-input.ts` | Sanitasi dan validasi input post |
+| `docs/PUBLICATION_GUIDELINES.md` | Checklist publikasi dan praktik aman |
 
-## Perintah pengembangan
+## Perintah
 
 ```bash
 npm run dev       # server pengembangan
@@ -96,32 +163,13 @@ npm run lint      # ESLint
 npm run typecheck # TypeScript check
 npm run build     # production build
 npm start         # jalankan hasil build
-npm run db:setup  # schema awal PostgreSQL
+npm run db:setup  # buat/migrasikan tabel dan starter posts
 ```
 
 ## Deployment
 
-Deploy sebagai aplikasi Next.js pada Vercel atau Node.js hosting yang mendukung Next.js. Siapkan PostgreSQL terkelola, masukkan environment variables ke hosting, lalu jalankan `db/schema.sql` satu kali atau `npm run db:setup` dari mesin yang dapat terhubung ke database. Konfigurasikan `NEXT_PUBLIC_SITE_URL` dengan domain final. Jangan mengandalkan filesystem deployment untuk menyimpan file yang diunggah.
+Deploy di platform yang mendukung Next.js 16 dan PostgreSQL, misalnya Vercel dengan database terkelola. Atur `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, dan `NEXT_PUBLIC_SITE_URL` pada environment deployment. Jalankan `npm run db:setup` dari lingkungan yang dapat mengakses database sebelum menggunakan API baru. Jangan mengandalkan filesystem deployment untuk menyimpan file unduhan.
 
-Saat ini file konten masih disimpan pada layanan eksternal; website menyimpan URL, mencatat hit download, lalu melakukan redirect. Cloudflare R2 atau storage S3-compatible dapat ditambahkan pada fase berikutnya untuk alur upload langsung.
+## QA status
 
-## Dokumentasi teknis
-
-- [Arsitektur dan alur data](docs/ARCHITECTURE.md)
-- [Setup dan workflow publikasi](docs/SETUP_AND_CONTENT_WORKFLOW.md)
-- [Deployment, keamanan, dan operasi](docs/DEPLOYMENT_AND_SECURITY.md)
-- [QA, batasan, dan changelog](docs/QA_AND_CHANGELOG.md)
-
-## Status implementasi
-
-**v0.2.0 — Soft Professional Redesign.** Source sudah diperbarui dan pemeriksaan sintaks statis dilakukan. Instalasi dependency terhenti karena registry tidak merespons dalam batas waktu sesi ini, sehingga `npm run lint`, `npm run typecheck` lengkap, `npm run build`, uji browser, dan integrasi PostgreSQL belum dapat dikonfirmasi. Lihat [QA_AND_CHANGELOG.md](docs/QA_AND_CHANGELOG.md) sebelum deploy.
-
-
-## Latest hotfix — v0.2.1
-
-This release fixes Vercel build-time failure caused by eager PostgreSQL initialization. Database connection creation is now lazy and occurs on the first database operation. See [QA and Changelog](docs/QA_AND_CHANGELOG.md) for details and deployment instructions. Ensure `DATABASE_URL` is configured in Vercel for the target environment before using database-backed features.
-
-
-## v0.2.2 deployment hotfix
-
-This release removes the lazy `db` Proxy and exports a plain `query()` function. API handlers now initialize PostgreSQL only when they execute a request query. To publish from the repository root, run `bash scripts/publish-vercel.sh`; it validates v0.2.2, pushes `main`, and prints the exact commit SHA Vercel must build. Configure `DATABASE_URL` in Vercel for runtime API use.
+Pemeriksaan sintaks dan inspeksi statis dilakukan terhadap source yang diperbarui. Instalasi dependency, lint penuh, typecheck penuh, production build, browser test, dan integrasi PostgreSQL perlu dijalankan pada environment proyek yang memiliki dependency dan kredensial database. Lihat `docs/QA_AND_CHANGELOG.md` untuk status verifikasi yang terukur.

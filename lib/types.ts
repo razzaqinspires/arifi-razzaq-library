@@ -48,3 +48,28 @@ export type ReleaseInput = {
   changelog: string[];
   featured: boolean;
 };
+
+
+export type PostKind = "journal" | "community" | "announcement";
+
+export type PostCard = {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  kind: PostKind;
+  category: string;
+  tags: string[];
+  coverImageUrl: string | null;
+  externalUrl: string | null;
+  featured: boolean;
+  published: boolean;
+  commentsCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PostDetail = PostCard & {
+  content: string;
+  comments: CommentItem[];
+};

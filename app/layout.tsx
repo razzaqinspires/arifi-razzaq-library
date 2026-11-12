@@ -5,13 +5,13 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
-  title: { default: "Arifi Razzaq Official — Creator Library", template: "%s | Arifi Razzaq Official" },
-  description: "Library resmi Arifi Razzaq Official. Temukan project, source code, aplikasi, tools, tutorial, catatan versi, dan tautan unduhan.",
-  applicationName: "Arifi Razzaq Creator Library",
-  keywords: ["Arifi Razzaq", "Creator Library", "source code", "project", "download", "tutorial", "aplikasi"],
+  title: { default: "Arifi Razzaq — Worklog & Public Library", template: "%s | Arifi Razzaq" },
+  description: "Arsip publik Arifi Razzaq untuk karya digital, source code, bot, aplikasi, jurnal kerja, eksperimen teknologi, dan diskusi komunitas.",
+  applicationName: "Arifi Razzaq Worklog & Public Library",
+  keywords: ["Arifi Razzaq", "Worklog", "Public Library", "Open Source", "source code", "bot", "software", "robotics", "AI", "tutorial", "aplikasi"],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  openGraph: { title: "Arifi Razzaq Official — Creator Library", description: "Library resmi untuk project, source code, aplikasi, tools, tutorial, dan update Arifi Razzaq.", type: "website", locale: "id_ID", siteName: "Arifi Razzaq Official" },
-  twitter: { card: "summary_large_image", title: "Arifi Razzaq Official — Creator Library", description: "Project, source code, tools, dan update dalam satu library." },
+  openGraph: { title: "Arifi Razzaq — Worklog & Public Library", description: "Arsip publik karya, proses kerja, eksperimen, pembelajaran, dan diskusi Arifi Razzaq.", type: "website", locale: "id_ID", siteName: "Arifi Razzaq" },
+  twitter: { card: "summary_large_image", title: "Arifi Razzaq — Worklog & Public Library", description: "Karya digital, jurnal kerja, source code, dan komunitas dalam satu ruang publik." },
 };
 
 export const viewport: Viewport = { themeColor: "#f5f6f3", colorScheme: "light" };

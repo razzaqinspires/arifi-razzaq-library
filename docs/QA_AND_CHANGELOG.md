@@ -1,98 +1,65 @@
 # QA and changelog
 
-## v0.2.0 — Soft Professional Redesign
+## v0.3.0 — Public Worklog & Community Posts — 2026-11-12
 
-### Changes
+### Implemented
 
-- Rebuilt the public homepage with a quieter editorial layout, muted sage/off-white palette, simplified creator preview, and clearer content hierarchy.
-- Replaced high-contrast dark/gold styling with white surfaces, restrained borders, subtle shadows, and softer typography.
-- Reworked responsive behavior for navigation, hero, library cards, detail view, and Creator Studio at mobile widths.
-- Reworked library cards and controls; added sorting for newest, downloads, ratings, and likes. Sort values are selected from a server allowlist.
-- Reworked release detail and feedback styling, with Indonesian interface copy.
-- Added edit-in-place release workflow in Creator Studio and `PUT /api/admin/releases/[id]`; update preserves comments, likes, ratings, and download count.
-- Improved metadata: application name, keywords, Open Graph locale/site name, Twitter summary, and light viewport theme color.
-- Removed hosted Google Fonts import from the main CSS to avoid a third-party font dependency.
-- Updated README and docs for exact paths, workflow, API behavior, and operational notes.
+- Repositioned the public website from a release-only creator library into a combined public worklog, digital library, and post-based community.
+- Kept the existing downloadable release routes and engagement behavior intact.
+- Added an expanded category taxonomy for the library, including coding, bot automation, web, AI, embedded/robotics/IoT, applications, game modding, open source, tutorials, product development, creative work, and documentation.
+- Added `posts` with `journal`, `community`, and `announcement` kinds; public/draft visibility; category, tags, optional cover, optional external reference, featured status, and timestamps.
+- Added public post listing/search/filter API, post detail API/page, post comment API, admin post create/update/delete/list APIs, and admin comment moderation APIs.
+- Added a unified Creator Studio with separate release, post, and moderation tabs.
+- Added thirteen launch posts through idempotent schema seed statements. These include six worklog topics and three discussion starters; no internal budget, credentials, or private operations details are included.
+- Fixed a variable-shadowing defect in the original release search API so its imported database query function remains callable.
+- Updated the homepage, navigation, metadata, footer, responsive styles, README, and publication guidelines.
+- No new runtime dependencies.
 
-### Files changed
+### Database migration
 
-| Path | Purpose / effect |
-|---|---|
-| `app/page.tsx` | New homepage composition and creator introduction |
-| `app/globals.css` | Replaced the design system; responsive public/detail/admin styling |
-| `app/layout.tsx` | Updated SEO/social metadata and viewport color |
-| `components/site-header.tsx` | Softer navigation and brand mark |
-| `components/site-footer.tsx` | Updated footer hierarchy and links |
-| `components/library-browser.tsx` | Search, category, sort controls, and redesigned release cards |
-| `components/release-detail.tsx` | Updated detail-page interface copy |
-| `components/admin-dashboard.tsx` | Added edit workflow and improved form states |
-| `app/api/releases/route.ts` | Added allowlisted sorting by date, downloads, likes, and rating |
-| `app/api/admin/releases/[id]/route.ts` | Added validated PUT update endpoint |
-| `package.json` | Version set to `0.2.0`; no new runtime dependencies |
-| `.env.example` | Documented optional local database SSL setting |
-| `README.md`, `docs/*.md` | Updated install, operations, architecture, security, and QA docs |
+- Added `posts` and `post_comments` tables and indexes.
+- Existing `releases`, likes, ratings, and release comments are unchanged.
+- Seed records use `ON CONFLICT (slug) DO NOTHING` and may be added to an existing database by re-running `npm run db:setup`.
+- Back up production PostgreSQL before applying schema changes.
 
-### QA status in this environment
+### Verification status in this workspace
 
-| Check | Result | Detail |
+| Check | Status | Notes |
 |---|---|---|
-| File structure | Pass | App Router pages, UI components, API routes, docs, and SQL schema present |
-| JSON parsing | Pass | `package.json` and `tsconfig.json` parse successfully |
-| TypeScript/TSX syntax transpilation | Pass | Syntax-only transpilation can be checked with the globally available TypeScript compiler API |
-| CSS brace balance | Pass | Stylesheet braces are balanced |
-| Dependency installation | Blocked | `npm install --no-audit --no-fund` timed out because the package registry did not respond during this session |
-| Full TypeScript typecheck | Not verified | Attempted; dependencies and type declarations were unavailable because installation did not complete |
-| ESLint | Not run | Requires installed project dependencies |
-| Next.js production build | Not run | Requires installed project dependencies |
-| Browser / responsive visual test | Not run | Requires a running Next.js server and browser |
-| PostgreSQL integration test | Not run | Requires a configured local/hosted PostgreSQL database |
+| ZIP extraction and project structure | Pass | All original project files extracted; existing release code retained |
+| New route and component source creation | Pass | Post routes/pages, Creator Studio tabs, and public feed added |
+| TypeScript/TSX syntax transpilation | Pass | 41 `.ts` / `.tsx` source files transpiled with zero syntax diagnostics |
+| Full `npm run typecheck` | Blocked | Project dependencies are absent; `npm install` timed out. A separate structural TypeScript check using temporary framework declarations passed; dependency-backed checks remain unavailable |
+| ESLint | Not verified | Requires installed dependencies |
+| Next.js production build | Not verified | Requires installed dependencies |
+| PostgreSQL migration/integration | Not verified | No live database credentials in the supplied archive |
+| Browser/mobile visual QA | Not verified | Requires running application and browser session |
 
 ### Known limitations
 
-- Download binaries are still hosted externally; Creator Studio stores an HTTP/HTTPS file URL but does not upload files.
-- No dedicated historical version table. Update the release version and maintain its change history in the changelog field.
-- Likes and ratings are keyed to anonymous browser cookies, not verified user accounts.
-- Comments publish immediately; an approval queue is not included.
-- No distributed rate limiter or CAPTCHA is included yet.
-- No real release records are seeded. The catalogue remains empty until content is published.
-
-### Migration and rollback
-
-- **Database migration:** none required for v0.2.0. The current schema is unchanged.
-- **Rollback:** restore the v0.1.0 source archive and redeploy if needed. No data rollback is required for the UI/API additions; the new update endpoint only updates columns already present. Back up PostgreSQL before any independent data changes.
-
-## v0.1.0 — Initial Creator Library MVP
-
-- First creator landing page, searchable category library, detail page, download redirect, likes, rating, comments, admin login, release create/delete, and PostgreSQL schema.
-
-
-## v0.2.1 — 2026-11-08 — Vercel build hotfix
-
-### Problem
-Vercel `next build` failed during page-data collection for `/api/admin/comments/[id]` because `lib/db.ts` threw when `DATABASE_URL` was absent at module import time. Next.js imports route modules during build analysis; a runtime-only secret must not be required at import time.
-
-### Changes
-- `lib/db.ts`: replaced eager Pool construction with a lazy `getPool()` initializer and a typed lazy proxy. Importing the database module is now safe during build-time route analysis. The first actual database operation still requires `DATABASE_URL` and produces a clear configuration error if it is missing.
-- `package.json`: bumped package version from `0.2.0` to `0.2.1`.
-
-### Operational impact
-- Configure `DATABASE_URL` in Vercel Project Settings → Environment Variables for Preview and Production (and Development if needed). Redeploy after saving it.
-- Configure `DATABASE_SSL` only when required by the PostgreSQL provider.
-- This change does not create or migrate the database and does not change the schema. Existing data is preserved.
-
-### Verification
-- Static inspection confirms `lib/db.ts` no longer reads `DATABASE_URL` or constructs `pg.Pool` during module import.
-- Full Vercel build and live database operations must be confirmed by the next deployment, because this workspace does not contain the deployment's PostgreSQL credentials.
-
-### Rollback
-Revert the `lib/db.ts` and `package.json` changes to the previous commit if necessary. No database migration or data rollback is required.
-
+- Public comments currently publish immediately; Creator Studio provides delete moderation, not a pre-approval queue.
+- There is no distributed rate limiter or CAPTCHA in this version. Consider adding edge/database-backed rate limiting before high-traffic community launch.
+- Visitors are anonymous; the site does not include registration, user profiles, direct messages, follows, or notifications.
+- Release files are hosted externally. There is no upload service or binary storage.
+- Post body is plain text with preserved line breaks; no Markdown editor or rich-text upload is included.
+- Game modding content must comply with source licenses and copyright; the site does not inspect uploaded/downloaded binaries.
 
 ## v0.2.2 — Database query initialization hotfix
 
-- Replaced the exported `db` Proxy with a plain async `query()` function.
-- Updated all API route handlers to call `query()` only inside request handlers.
-- This prevents Next.js route export/configuration inspection from triggering database initialization through Proxy property access.
-- Added `scripts/publish-vercel.sh` to validate version/branch, commit changes or create a deployment-trigger commit, push `main`, and verify the remote SHA.
-- Required Vercel runtime setting remains `DATABASE_URL`; this value is required when database-backed APIs are called, not during build-time module import.
-- QA limitation: dependency installation and production build must be run in the user's environment/Vercel; no successful Vercel deployment is claimed by this archive.
+- Replaced lazy database Proxy with a plain `query()` function.
+- API route handlers initialize PostgreSQL only when an actual request executes a query.
+- Added deployment publishing helper. Build and live deployment remain the operator's responsibility.
+
+## v0.2.1 — Vercel build hotfix
+
+- Removed eager database connection initialization during build-time module import.
+- Required runtime database setting remains `DATABASE_URL`.
+
+## v0.2.0 — Soft Professional Redesign
+
+- Redesigned homepage, cards, release details, responsive behavior, metadata, and Creator Studio with an off-white/sage visual system.
+- Added release edit-in-place support and sorting.
+
+## v0.1.0 — Initial Creator Library MVP
+
+- Searchable category library, release detail, download redirect, likes, ratings, comments, admin login, release CRUD, and PostgreSQL schema.

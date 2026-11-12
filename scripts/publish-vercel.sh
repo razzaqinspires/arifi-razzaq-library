@@ -13,8 +13,8 @@ if [[ "$BRANCH" != "main" ]]; then
 fi
 
 VERSION="$(node -p "require('./package.json').version")"
-if [[ "$VERSION" != "0.2.2" ]]; then
-  echo "[ERROR] Versi package harus 0.2.2, ditemukan: $VERSION" >&2
+if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "[ERROR] Versi package tidak mengikuti format semver: $VERSION" >&2
   exit 1
 fi
 
@@ -28,12 +28,12 @@ grep -q 'export async function query' lib/db.ts || {
 }
 
 if [[ -n "$(git status --porcelain)" ]]; then
-  echo "[INFO] Ada perubahan source; membuat commit v0.2.2."
+  echo "[INFO] Ada perubahan source; membuat commit v$VERSION."
   git add -A
-  git commit -m "fix: defer database access until route execution v0.2.2"
+  git commit -m "chore: publish public worklog library v$VERSION"
 else
   echo "[INFO] Working tree bersih; membuat commit pemicu deployment."
-  git commit --allow-empty -m "chore: trigger Vercel deployment v0.2.2"
+  git commit --allow-empty -m "chore: trigger Vercel deployment v$VERSION"
 fi
 
 git push origin main

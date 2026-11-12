@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { ReleaseCard } from "@/lib/types";
+import { LIBRARY_CATEGORIES } from "@/lib/content";
 
 function dateLabel(value: string) {
   const date = new Date(value);
@@ -43,11 +44,12 @@ export function LibraryBrowser() {
   }, [query, category, sort]);
 
   const reset = () => { setQuery(""); setCategory("Semua"); setSort("newest"); };
+  const visibleCategories = Array.from(new Set([...LIBRARY_CATEGORIES, ...categories]));
 
   return (
     <section className="library-section" id="library">
       <div className="section-heading">
-        <div><span className="eyebrow">BROWSE COLLECTION</span><h2>Jelajahi library<span className="accent-dot">.</span></h2><p>Semua project dan resource dalam satu katalog yang mudah ditelusuri.</p></div>
+        <div><span className="eyebrow">BROWSE COLLECTION</span><h2>Jelajahi library<span className="accent-dot">.</span></h2><p>Source code, script, aplikasi, tools, dan file rilis yang siap dibagikan.</p></div>
         <div className="library-count"><strong>{loading ? "—" : releases.length.toString().padStart(2, "0")}</strong><span>KONTEN DITEMUKAN</span></div>
       </div>
       <div className="library-controls">
@@ -55,7 +57,7 @@ export function LibraryBrowser() {
         <label className="sort-control"><span>Urutkan</span><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Urutkan konten"><option value="newest">Terbaru</option><option value="downloads">Paling banyak diunduh</option><option value="rating">Rating tertinggi</option><option value="likes">Paling disukai</option></select></label>
       </div>
       <div className="category-row" aria-label="Filter kategori">
-        {["Semua", ...categories].map((item) => <button key={item} onClick={() => setCategory(item)} className={`category-chip ${category === item ? "active" : ""}`} type="button" aria-pressed={category === item}>{item === "Semua" ? <span className="chip-icon">◫</span> : null}{item}</button>)}
+        {["Semua", ...visibleCategories].map((item) => <button key={item} onClick={() => setCategory(item)} className={`category-chip ${category === item ? "active" : ""}`} type="button" aria-pressed={category === item}>{item === "Semua" ? <span className="chip-icon">◫</span> : null}{item}</button>)}
       </div>
       <div className="library-result-line"><span>{loading ? "Memuat koleksi..." : `${releases.length} konten tersedia`}</span><span>ARIFI RAZZAQ · LIBRARY</span></div>
       {error ? <div className="state-panel error-panel"><strong>Library belum tersedia</strong><p>{error}</p><span>Periksa koneksi database dan konfigurasi server.</span></div> : loading ? (

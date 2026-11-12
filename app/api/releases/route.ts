@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = (searchParams.get("q") ?? "").trim().slice(0, 120);
+    const searchTerm = (searchParams.get("q") ?? "").trim().slice(0, 120);
     const category = (searchParams.get("category") ?? "").trim().slice(0, 80);
     const sort = searchParams.get("sort") ?? "newest";
     const sortOrders = {
@@ -17,8 +17,8 @@ export async function GET(request: Request) {
     const orderBy = sortOrders[sort as keyof typeof sortOrders] ?? sortOrders.newest;
     const values: unknown[] = [];
     const where: string[] = [];
-    if (query) {
-      values.push(`%${query.replace(/[\\%_]/g, "\\$&")}%`);
+    if (searchTerm) {
+      values.push(`%${searchTerm.replace(/[\\%_]/g, "\\$&")}%`);
       where.push(`(r.title ILIKE $${values.length} ESCAPE '\\' OR r.short_description ILIKE $${values.length} ESCAPE '\\' OR r.description ILIKE $${values.length} ESCAPE '\\' OR r.version ILIKE $${values.length} ESCAPE '\\' OR r.slug ILIKE $${values.length} ESCAPE '\\' OR EXISTS (SELECT 1 FROM unnest(r.tags) tag WHERE tag ILIKE $${values.length} ESCAPE '\\'))`);
     }
     if (category && category !== "Semua") {
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
        ORDER BY ${orderBy}`,
       values,
     );
-    const categories = await query("SELECT DISTINCT category FROM releases ORDER BY category ASC");
+    const categories = await query<{ category: string }>("SELECT DISTINCT category FROM releases ORDER BY category ASC");
     return Response.json({ releases: result.rows, categories: categories.rows.map((row) => row.category) });
   } catch (error) {
     console.error("[GET /api/releases]", error);
