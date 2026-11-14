@@ -35,7 +35,7 @@ A convenience script is included:
 npm run neon:setup
 ```
 
-If Neon opens a browser sign-in, complete it with the account that owns or has access to the project. The current Neon CLI documentation uses `neon auth` for browser authentication; if the installed CLI reports a different login command, follow the installed CLI's help/output. The CLI may also be used through `npx neon@latest` if a global binary is unavailable.
+Authenticate first with `neon auth` using an account that owns or has access to the project. Current Neon CLI `init -y` is non-interactive; if the CLI is not authenticated, it can skip linking and print the next required step rather than opening a browser sign-in. If the installed CLI reports a different auth command, follow its own help/output. The CLI may also be used through `npx neon@latest` if a global binary is unavailable.
 
 After provisioning, verify `.env.local` (or `.env`) contains the variables Neon generated. Never paste actual database connection strings or tokens into public posts, source control, screenshots, or this documentation. `.env`, `.env.local`, and `.neon` are ignored by Git.
 
@@ -91,3 +91,17 @@ Provisioning a Neon service does not automatically integrate it into application
 - Neon backend update (Nov 10, 2026): <https://neon.com/blog/whats-new-with-the-neon-backend>
 - `neon.ts` infrastructure-as-code overview: <https://neon.com/blog/introducing-neon-ts>
 - Neon serverless driver background: <https://neon.com/blog/how-to-use-postgres-at-the-edge>
+
+## Automated application startup (v0.5.0)
+
+The application and the Neon infrastructure have different lifecycle operations:
+
+- `npm start` locally loads `.env` / `.env.local`, verifies the database, applies `db/schema.sql` under a PostgreSQL advisory lock, verifies core tables, then starts `next start`.
+- `npm run dev` does the same before `next dev`.
+- Vercel runs `ARIFI_VERCEL_BUILD=1 npm run build` from `vercel.json`. The explicit marker makes the build script apply/verify the schema first, then invoke `next build`. A missing/unreachable `DATABASE_URL` stops the deployment build.
+- Runtime API routes use the pooled `DATABASE_URL` lazily through the Node.js `pg` pool. `/api/health` provides a generic database connectivity check.
+
+Configure `DATABASE_URL` separately in Vercel Production and Preview. Production should use the `production` branch. Preview should use a separate Neon branch/URL to keep preview schema operations isolated. Do not commit or display the connection string. `ARIFI_DB_AUTO_MIGRATE=false` disables the Vercel build bootstrap only when another tested migration pipeline is responsible for it.
+
+This automation does **not** launch the Neon Console or run `neon init` / `neon deploy` on every request. The CLI `init` links the working directory to the Neon project and can write `neon.ts`; `deploy` applies its infrastructure configuration. Run those owner-authorized provisioning steps once from an authenticated terminal. The Neon database itself is a managed cloud service, not a local process to spawn from `npm start`. See `docs/AUTOMATED_STARTUP.md` for the complete lifecycle and operating boundaries.
+

@@ -1,5 +1,38 @@
 # QA and changelog
 
+## v0.5.0 — Automated Startup & Neon Build Bootstrap — 2026-11-14
+
+### Implemented
+
+- `npm start` now loads `.env` / `.env.local`, bootstraps and verifies the PostgreSQL schema, builds Next.js if `.next/BUILD_ID` is missing, and starts `next start` only after the database and production build are ready.
+- `npm run dev` follows the same one-command bootstrap before `next dev`.
+- Vercel's configured `ARIFI_VERCEL_BUILD=1 npm run build` command runs a database bootstrap first, requires a valid `DATABASE_URL`, and stops the deployment build if the schema or connection check fails.
+- Added PostgreSQL advisory locking around the schema transaction to serialize concurrent build/start bootstrap attempts.
+- Added `npm run db:check` and `/api/health` for database diagnostics.
+- Sized the lazy Node.js `pg` pool to one client per warm serverless instance; documented Neon pooled connection URI requirements.
+- Added `vercel.json`, `docs/AUTOMATED_STARTUP.md`, and updates to README, architecture, deployment/security, Neon setup, worklog, and agent rules.
+- Explicitly kept `neon init` / `neon deploy` out of app startup and Vercel request runtime. Those remain one-time infrastructure operations; only the app schema bootstrap is automated.
+
+### Verification status at packaging
+
+- `node --check scripts/build.mjs scripts/check-db.mjs scripts/launch.mjs scripts/setup-db.mjs`: PASS.
+- JSON parsing for `package.json` and `vercel.json`, including version and npm hook assertions: PASS.
+- `bash -n scripts/setup-neon.sh`: PASS.
+- TypeScript `transpileModule` syntax checks for `app/api/health/route.ts` and `lib/db.ts`: PASS (syntax only; no dependency typecheck).
+- Startup/build control-flow simulation with temporary mock `pg` and `next` modules: PASS. `npm start` ran schema bootstrap, first-run build and `next start`; a second simulation with an existing build skipped compilation; forced rebuild ran build and start again. `ARIFI_VERCEL_BUILD=1 npm run build` ran schema bootstrap before `next build`. The mock did not contact a real Neon database or run the real Next.js compiler.
+- Negative preflight tests: `npm start` stopped when `DATABASE_URL` was absent; `ARIFI_VERCEL_BUILD=1 npm run build` stopped before Next.js build when `DATABASE_URL` was absent. Both behaved as intended.
+- `npm run lint`, dependency-backed `npm run typecheck`, and `npm run build`: not run successfully because `node_modules` is absent in this workspace and npm registry access previously failed with `EAI_AGAIN`.
+- Live Neon authentication, `neon deploy`, database migration, `/api/health` against the production database, and Vercel deployment remain unverified. No actual credentials were available in the workspace.
+
+### Required Vercel configuration
+
+- Set `DATABASE_URL` to the pooled Neon URI separately for Production and Preview. Use a non-production Neon branch/URL for Preview.
+- Set `ADMIN_PASSWORD`, `SESSION_SECRET`, and `NEXT_PUBLIC_SITE_URL` in Vercel Environment Variables.
+- Leave Build Command as `ARIFI_VERCEL_BUILD=1 npm run build`. The app's Vercel build script performs the idempotent schema bootstrap before `next build`.
+- Do not add `neon init` or `neon deploy` to Vercel Build Command or runtime. Do not store `DATABASE_URL` or provider credentials in source control.
+
+---
+
 ## v0.4.0 — 2026-11-14
 
 ### Changes
@@ -40,7 +73,6 @@ After `npm start`, verify homepage sections, `/website-templates/index.html` and
 
 ---
 
-# QA and changelog
 
 ## v0.3.0 — Public Worklog & Community Posts — 2026-11-12
 

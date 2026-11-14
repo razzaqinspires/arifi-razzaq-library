@@ -1,0 +1,4 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "ARIFI_VERCEL_BUILD=1 npm run build"
+}

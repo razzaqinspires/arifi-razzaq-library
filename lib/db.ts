@@ -20,9 +20,11 @@ function getPool(): Pool {
 
   const pool = new Pool({
     connectionString,
-    max: 10,
-    idleTimeoutMillis: 30_000,
+    // Keep one client per warm serverless instance; use Neon pooled DATABASE_URL.
+    max: 1,
+    idleTimeoutMillis: 5_000,
     connectionTimeoutMillis: 10_000,
+    application_name: "arifi-razzaq-library-runtime",
     ssl: process.env.DATABASE_SSL === "false" ? false : undefined,
   });
 

@@ -1,6 +1,6 @@
 # Arifi Razzaq — Worklog & Public Library
 
-**Versi: 0.4.0** · Next.js 16 · React 19 · TypeScript · PostgreSQL
+**Versi: 0.5.0** · Next.js 16 · React 19 · TypeScript · PostgreSQL
 
 Ruang publik untuk mendokumentasikan karya digital, proses kerja, pembelajaran, eksperimen, dan diskusi komunitas. Website ini mengembangkan Creator Library awal menjadi ruang kerja publik yang mencakup empat area utama:
 
@@ -10,6 +10,16 @@ Ruang publik untuk mendokumentasikan karya digital, proses kerja, pembelajaran, 
 4. **Portfolio & Website Services** — portofolio proyek, starter website templates, dan konsultasi pengembangan website melalui WhatsApp Razzaq Ventures.
 
 Konten publik tidak dimaksudkan sebagai salinan catatan internal bisnis. Jangan publikasikan modal, data pribadi, kredensial, token, password, konfigurasi privat, atau informasi pihak lain tanpa izin.
+
+## Yang berubah pada v0.5.0
+
+- Menjadikan `npm start` sebagai satu perintah startup lokal: memuat environment, memeriksa koneksi PostgreSQL, menerapkan skema idempotent dengan advisory lock, memverifikasi tabel, membuat production build jika belum ada, lalu menjalankan Next.js.
+- Menjadikan `npm run dev` memakai bootstrap database yang sama sebelum menjalankan server pengembangan.
+- Mengubah `npm run build` agar pada Vercel menjalankan bootstrap Neon PostgreSQL sebelum `next build`; build berhenti jika database tidak tersedia atau skema gagal disiapkan.
+- Menambahkan endpoint health check `/api/health` dan perintah diagnostik `npm run db:check`.
+- Mengoptimalkan pool PostgreSQL untuk fungsi serverless dengan satu koneksi per warm instance dan menganjurkan pooled Neon connection URI.
+- Menambahkan `docs/AUTOMATED_STARTUP.md` untuk membedakan startup aplikasi dari provisioning infrastruktur Neon.
+- Menegaskan bahwa `neon init` / `neon deploy` adalah langkah infrastruktur terotorisasi yang dijalankan sekali, bukan proses yang dipanggil pada setiap start atau request Vercel.
 
 ## Yang berubah pada v0.4.0
 
@@ -75,15 +85,15 @@ cp .env.example .env
 nvim .env
 # Neon CLI may also write .env.local; keep both files private
 
-# Buat database kosong bila belum ada
-createdb arifi_library
-
-# Install dependency dan siapkan seluruh tabel
+# Install dependency
 npm install
-npm run db:setup
 
-# Jalankan aplikasi
+# Jalankan satu perintah; database disiapkan otomatis sebelum Next.js
 npm run dev
+
+# Untuk menjalankan production build lokal, lalu server production:
+npm run build
+npm start
 ```
 
 Buka `http://localhost:3000`. Creator Studio berada di `http://localhost:3000/admin`.
@@ -172,15 +182,19 @@ Schema menggunakan `CREATE TABLE IF NOT EXISTS` dan starter posts memakai `ON CO
 ## Perintah
 
 ```bash
-npm run dev       # server pengembangan
-npm run lint      # ESLint
-npm run typecheck # TypeScript check
-npm run build     # production build
-npm start         # jalankan hasil build
-npm run db:setup  # buat/migrasikan tabel dan starter posts
-npm run neon:setup # setup Neon (memerlukan autentikasi akun)
+npm run dev        # bootstrap DB lalu jalankan server pengembangan
+npm run build      # di Vercel: bootstrap DB lalu next build; lokal: next build
+npm start          # bootstrap DB, build jika perlu, lalu jalankan server production lokal
+npm run db:check   # uji koneksi dan tabel inti
+npm run db:setup   # jalankan bootstrap skema secara manual
+npm run lint       # ESLint
+npm run typecheck  # TypeScript check
+npm run neon:setup # provisioning Neon sekali, dari terminal terotorisasi
 npm run neon:status # tampilkan project/branch terhubung
 ```
+
+Panduan satu-perintah dan alur Vercel: `docs/AUTOMATED_STARTUP.md`. Pada Vercel, platform memakai Build Command dan Node.js Functions; bukan proses `npm start` permanen. Pastikan `DATABASE_URL` production dan preview diatur pada Vercel sebelum deployment.
+
 
 ## Portfolio dan jasa website
 
@@ -195,16 +209,16 @@ Lihat `docs/PORTFOLIO_AND_SERVICES.md` dan `docs/WORKLOG.md` untuk catatan lengk
 
 ## Neon database
 
-Project Neon yang ditentukan pemilik dicatat di `docs/NEON_SETUP.md`. Setelah sesi akun Neon tersedia, gunakan `npm run neon:setup`, lalu periksa `.env.local`, jalankan `npm run db:setup`, dan uji integrasi. Provisioning, environment production Vercel, dan pengujian end-to-end belum boleh dianggap selesai sebelum diverifikasi. Jangan menyimpan database URI, kata sandi, atau API key ke repository.
+Project Neon yang ditentukan pemilik dicatat di `docs/NEON_SETUP.md`. Provisioning Neon (`neon init` / `neon deploy`) tetap merupakan langkah infrastruktur satu kali dengan sesi akun terotorisasi. Setelah pooled `DATABASE_URL` dipasang di `.env.local` dan Vercel, `npm start` / `npm run dev` menyiapkan skema sebelum server lokal berjalan, sedangkan setiap Vercel build menyiapkan skema sebelum `next build`. Lihat `docs/AUTOMATED_STARTUP.md`. Jangan menyimpan database URI, kata sandi, atau API key ke repository.
 
-## Status publikasi v0.4.0
+## Status publikasi v0.5.0
 
 Source Library telah diperbarui dan dikemas untuk ditinjau. Pembaruan ini belum dipublikasikan ke deployment website Library: konteks Vercel yang tersedia pada sesi ini tidak menampilkan team/project yang dapat diakses. Jangan menganggap perubahan pada arsip source otomatis sudah tampil di domain produksi.
 
 ## Deployment
 
-Deploy di platform yang mendukung Next.js 16 dan PostgreSQL, misalnya Vercel dengan database terkelola. Atur `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, dan `NEXT_PUBLIC_SITE_URL` pada environment deployment. Untuk Neon, gunakan pooled PostgreSQL URI untuk route Node.js pada deployment serverless. Jalankan `npm run db:setup` dari lingkungan yang dapat mengakses database sebelum menggunakan API baru. Jangan mengandalkan filesystem deployment untuk menyimpan file unduhan.
+Deploy di platform yang mendukung Next.js 16 dan PostgreSQL, misalnya Vercel dengan database terkelola. Atur `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, dan `NEXT_PUBLIC_SITE_URL` pada environment deployment. Untuk Neon, gunakan pooled PostgreSQL URI untuk route Node.js pada deployment serverless. Pada Vercel, `npm run build` menjalankan bootstrap skema otomatis dan membutuhkan `DATABASE_URL` yang valid; secara lokal, `npm start` atau `npm run dev` menjalankan bootstrap sebelum server aktif. Jangan mengandalkan filesystem deployment untuk menyimpan file unduhan.
 
 ## QA status
 
-Status v0.4.0 dicatat di `docs/QA_AND_CHANGELOG.md`. Jangan menganggap deployment Neon, migration database, atau end-to-end test berhasil sebelum perintahnya dijalankan dan output-nya dicatat.
+Status v0.5.0 dicatat di `docs/QA_AND_CHANGELOG.md`. Jangan menganggap deployment Neon, migration database, atau end-to-end test berhasil sebelum perintahnya dijalankan dan output-nya dicatat.

@@ -1,5 +1,32 @@
 # Arifi Razzaq Library — Worklog
 
+## 2026-11-14 — v0.5.0 automated startup and Vercel database bootstrap
+
+**Scope:** Reduce setup to one local start command and make Vercel deployments fail fast unless Neon PostgreSQL is reachable and the application schema is ready.
+
+**Changes made in source:**
+
+- Replaced direct `next dev` / `next start` npm scripts with `scripts/launch.mjs`: `npm run dev` and `npm start` load private `.env` files, run the database bootstrap, verify required tables, and only then start Next.js. Local `npm start` also runs `next build` automatically if `.next/BUILD_ID` is missing; `ARIFI_REBUILD_ON_START=true` forces a fresh build.
+- Hardened `scripts/setup-db.mjs` with a PostgreSQL connection preflight, transaction-level advisory lock, one transaction for the idempotent schema, and post-apply core table verification.
+- Replaced the plain `next build` npm script with `scripts/build.mjs`. On Vercel (`ARIFI_VERCEL_BUILD=1` or the Vercel system environment), it requires `DATABASE_URL`, runs the schema bootstrap, then executes `next build`. Local builds remain independent of a live database.
+- Added `scripts/check-db.mjs`, `npm run db:check`, and a no-store `/api/health` route that returns 200 only when PostgreSQL is reachable.
+- Reduced the lazy `pg` pool to one connection per warm Node.js function instance and retained the requirement to use Neon pooled connection URLs.
+- Added `vercel.json` with the explicit `ARIFI_VERCEL_BUILD=1 npm run build` hook and documented the difference between application startup and one-time Neon infrastructure provisioning.
+- Updated README, architecture, deployment/security, Neon setup, AGENTS, and QA records. Increased project version to 0.5.0.
+- Added a safety guard so `npm run neon:setup` refuses to provision infrastructure in the Vercel build/runtime.
+
+**Lifecycle design:** `npm start` is the local single-command production startup. Vercel does not run a permanent `npm start` process; its build invokes `npm run build`, and its Node.js Functions connect to Neon at request runtime. The Neon Console/CLI is not launched on each request or build. The owner-authorized `neon init` / `neon deploy` step remains a one-time infrastructure operation. Only PostgreSQL app-schema bootstrap is automated; Neon Auth, AI Gateway, Object Storage, Functions, and Realtime are not claimed as wired.
+
+**Verification performed in this workspace:**
+
+- `node --check` passed for all four `scripts/*.mjs` modules.
+- JSON parsing and npm hook assertions passed for `package.json` and `vercel.json`.
+- `bash -n scripts/setup-neon.sh` passed.
+- TypeScript `transpileModule` syntax checks passed for `app/api/health/route.ts` and `lib/db.ts` (syntax only, not a dependency-backed typecheck).
+- A temporary mock `pg` + mock Next CLI simulation confirmed the local `npm start` control flow (`schema bootstrap → next start`) and Vercel build flow (`schema bootstrap → next build`). The test stubs were removed; this does not verify a real database or Next.js build.
+- Negative preflight tests confirmed that local startup rejects a missing `DATABASE_URL` and Vercel build rejects a missing `DATABASE_URL` before invoking Next.js.
+- Dependency-backed `npm run lint`, `npm run typecheck`, real `npm run build`, real Neon connection/migration, live `/api/health`, and Vercel deployment remain unverified. `node_modules` is absent and no authorized database URL or accessible Vercel project is available in this workspace.
+
 Catatan ini adalah rekam jejak perubahan proyek. Status dan hasil tes dicatat sesuai bukti yang tersedia; aktivitas yang belum diverifikasi tidak ditulis sebagai selesai.
 
 ## 2026-11-14 — Library portfolio, konsultasi website, templates, and Neon record

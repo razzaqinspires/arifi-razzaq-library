@@ -27,6 +27,7 @@ The separation prevents a process note or community question from needing a fake
 
 | Method | Route | Purpose |
 |---|---|---|
+| GET | `/api/health` | Runtime health and PostgreSQL connectivity |
 | GET | `/api/releases` | Search/filter/sort downloadable releases |
 | GET | `/api/releases/[slug]` | Release detail and engagement |
 | GET | `/api/posts` | Search/filter public posts |
@@ -50,7 +51,7 @@ Release endpoints and admin routes from the original library remain in place.
 
 ### Database
 
-The connection pool is initialized lazily by `lib/db.ts` at the first actual query, not during build-time import. `db/schema.sql` defines both domains and idempotent public starter posts. The intended hosted database is Neon PostgreSQL; project identifiers and setup requirements are documented in `docs/NEON_SETUP.md`. The code currently uses `pg` in the Node.js runtime and expects `DATABASE_URL` from a private environment file or hosting environment.
+The connection pool is initialized lazily by `lib/db.ts` at the first actual query, not during build-time import. It is sized to one connection per warm Vercel function instance and must use the Neon pooled PostgreSQL URI. `db/schema.sql` defines both domains and idempotent public starter posts. Locally, `npm start` / `npm run dev` apply and verify the schema before starting Next.js. During a Vercel deployment, `npm run build` applies and verifies the schema before `next build`; runtime API handlers connect lazily. `/api/health` checks live database connectivity without exposing secrets. See `docs/AUTOMATED_STARTUP.md` and `docs/NEON_SETUP.md`.
 
 ### Public templates and client work
 
