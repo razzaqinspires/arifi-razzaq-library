@@ -1,14 +1,26 @@
 # Arifi Razzaq — Worklog & Public Library
 
-**Versi: 0.3.0** · Next.js 16 · React 19 · TypeScript · PostgreSQL
+**Versi: 0.4.0** · Next.js 16 · React 19 · TypeScript · PostgreSQL
 
-Ruang publik untuk mendokumentasikan karya digital, proses kerja, pembelajaran, eksperimen, dan diskusi komunitas. Website ini mengembangkan Creator Library awal menjadi tiga area yang saling melengkapi:
+Ruang publik untuk mendokumentasikan karya digital, proses kerja, pembelajaran, eksperimen, dan diskusi komunitas. Website ini mengembangkan Creator Library awal menjadi ruang kerja publik yang mencakup empat area utama:
 
 1. **Library** — source code, script, bot, aplikasi, tools, modifikasi buatan sendiri, dan berkas rilis yang memang siap dibagikan.
 2. **Jurnal Kerja** — catatan pengembangan, eksperimen, troubleshooting, pembelajaran, serta proses di balik sebuah project.
 3. **Ruang Komunitas** — post diskusi, pertanyaan, pertukaran pengalaman, dan komentar pembaca.
+4. **Portfolio & Website Services** — portofolio proyek, starter website templates, dan konsultasi pengembangan website melalui WhatsApp Razzaq Ventures.
 
 Konten publik tidak dimaksudkan sebagai salinan catatan internal bisnis. Jangan publikasikan modal, data pribadi, kredensial, token, password, konfigurasi privat, atau informasi pihak lain tanpa izin.
+
+## Yang berubah pada v0.4.0
+
+- Menambahkan portofolio dan rekam jejak proyek dengan label status yang membedakan website live dari software yang masih dikembangkan.
+- Menambahkan konsultasi jasa pengembangan website Razzaq Ventures dengan tautan WhatsApp `+62 831-9390-5842`.
+- Menambahkan katalog template Tour & Travel, Company Profile, dan Product Landing. Dua template HTML/CSS statis dapat dibuka offline dan dilihat melalui `/website-templates/index.html` (katalog), `/website-templates/company-profile/index.html`, dan `/website-templates/product-landing/index.html`.
+- Menyimpan source HERU BALI TOUR pada `projects/client-work/heru-bali-tour/` beserta URL publiknya. Source tersebut adalah client work dan tidak otomatis berlisensi untuk penggunaan ulang.
+- Mencatat WHISKAY-BOT, AISYAH × NEXORA, serta infrastruktur Vercel dan Neon.
+- Menambahkan `docs/WORKLOG.md`, `docs/PORTFOLIO_AND_SERVICES.md`, `docs/NEON_SETUP.md`, dan `AGENTS.md`.
+- Menambahkan skrip opsional `npm run neon:setup`; provisioning Neon memerlukan sesi autentikasi akun dan tidak dieksekusi otomatis saat build.
+- Menyesuaikan `db:setup` agar membaca `.env` dan `.env.local`.
 
 ## Yang berubah pada v0.3.0
 
@@ -29,6 +41,7 @@ Konten publik tidak dimaksudkan sebagai salinan catatan internal bisnis. Jangan 
 | Jurnal Kerja | Worklog, riset, proses, pelajaran, eksperimen | `/` → Rekam kerja; detail `/posts/[slug]` |
 | Ruang Komunitas | Pertanyaan dan diskusi berbasis post | `/` → Komunitas; detail `/posts/[slug]` |
 | Creator Studio | Kelola release, post, draft, dan komentar | `/admin` |
+| Portfolio & layanan | Karya, template website, konsultasi, dan sistem pendukung | `/#portfolio`, `/#templates`, `/#website-service`, `/#infrastructure` |
 
 ### Taksonomi Library
 
@@ -60,6 +73,7 @@ cd arifi-razzaq-library
 # Siapkan environment
 cp .env.example .env
 nvim .env
+# Neon CLI may also write .env.local; keep both files private
 
 # Buat database kosong bila belum ada
 createdb arifi_library
@@ -164,12 +178,33 @@ npm run typecheck # TypeScript check
 npm run build     # production build
 npm start         # jalankan hasil build
 npm run db:setup  # buat/migrasikan tabel dan starter posts
+npm run neon:setup # setup Neon (memerlukan autentikasi akun)
+npm run neon:status # tampilkan project/branch terhubung
 ```
+
+## Portfolio dan jasa website
+
+Portofolio website, template, jasa konsultasi, dan infrastruktur ditampilkan pada homepage. HERU BALI TOUR tercatat sebagai website live yang diberikan oleh pemilik proyek. WHISKAY-BOT dan AISYAH × NEXORA tetap ditandai sebagai proyek pengembangan. Company Profile dan Product Landing adalah starter template, bukan klaim hasil proyek klien.
+
+- Konsultasi website Razzaq Ventures: WhatsApp `+62 831-9390-5842`.
+- HERU BALI TOUR live: <https://heru-bali-tour-website.vercel.app/>.
+- Open templates: `website-templates/` (HTML/CSS, dapat dibuka offline).
+- Source proyek klien: `projects/client-work/heru-bali-tour/` (tidak untuk distribusi ulang tanpa izin klien).
+
+Lihat `docs/PORTFOLIO_AND_SERVICES.md` dan `docs/WORKLOG.md` untuk catatan lengkap.
+
+## Neon database
+
+Project Neon yang ditentukan pemilik dicatat di `docs/NEON_SETUP.md`. Setelah sesi akun Neon tersedia, gunakan `npm run neon:setup`, lalu periksa `.env.local`, jalankan `npm run db:setup`, dan uji integrasi. Provisioning, environment production Vercel, dan pengujian end-to-end belum boleh dianggap selesai sebelum diverifikasi. Jangan menyimpan database URI, kata sandi, atau API key ke repository.
+
+## Status publikasi v0.4.0
+
+Source Library telah diperbarui dan dikemas untuk ditinjau. Pembaruan ini belum dipublikasikan ke deployment website Library: konteks Vercel yang tersedia pada sesi ini tidak menampilkan team/project yang dapat diakses. Jangan menganggap perubahan pada arsip source otomatis sudah tampil di domain produksi.
 
 ## Deployment
 
-Deploy di platform yang mendukung Next.js 16 dan PostgreSQL, misalnya Vercel dengan database terkelola. Atur `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, dan `NEXT_PUBLIC_SITE_URL` pada environment deployment. Jalankan `npm run db:setup` dari lingkungan yang dapat mengakses database sebelum menggunakan API baru. Jangan mengandalkan filesystem deployment untuk menyimpan file unduhan.
+Deploy di platform yang mendukung Next.js 16 dan PostgreSQL, misalnya Vercel dengan database terkelola. Atur `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, dan `NEXT_PUBLIC_SITE_URL` pada environment deployment. Untuk Neon, gunakan pooled PostgreSQL URI untuk route Node.js pada deployment serverless. Jalankan `npm run db:setup` dari lingkungan yang dapat mengakses database sebelum menggunakan API baru. Jangan mengandalkan filesystem deployment untuk menyimpan file unduhan.
 
 ## QA status
 
-Pemeriksaan sintaks dan inspeksi statis dilakukan terhadap source yang diperbarui. Instalasi dependency, lint penuh, typecheck penuh, production build, browser test, dan integrasi PostgreSQL perlu dijalankan pada environment proyek yang memiliki dependency dan kredensial database. Lihat `docs/QA_AND_CHANGELOG.md` untuk status verifikasi yang terukur.
+Status v0.4.0 dicatat di `docs/QA_AND_CHANGELOG.md`. Jangan menganggap deployment Neon, migration database, atau end-to-end test berhasil sebelum perintahnya dijalankan dan output-nya dicatat.

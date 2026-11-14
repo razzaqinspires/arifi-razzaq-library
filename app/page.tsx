@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LibraryBrowser } from "@/components/library-browser";
 import { PostBrowser } from "@/components/post-browser";
+import { BusinessShowcase } from "@/components/business-showcase";
 
 const quickLinks = [
   { number: "01", title: "Public Library", detail: "Source code, scripts & tools", icon: "{ }" },
@@ -48,6 +49,8 @@ export default function HomePage() {
       </section>
 
       <div className="shell"><LibraryBrowser /><PostBrowser /></div>
+
+      <BusinessShowcase />
 
       <section className="about-section" id="about">
         <div className="shell about-inner">

@@ -10,6 +10,10 @@ The application is a Next.js App Router project with server API routes, client-s
 - `/library/[slug]` — release detail, file redirect, like/rating, and release comments.
 - `/posts/[slug]` — public journal, community topic, or announcement with comments.
 - `/admin` — password-protected Creator Studio.
+- `/#portfolio` — project portfolio with evidence-based status labels.
+- `/#templates` — website template catalogue; static previews are served from `/website-templates/`.
+- `/#website-service` — Razzaq Ventures website consultation contact.
+- `/#infrastructure` — project infrastructure overview and Neon Console reference.
 
 ### Data domains
 
@@ -46,4 +50,10 @@ Release endpoints and admin routes from the original library remain in place.
 
 ### Database
 
-The connection pool is initialized lazily by `lib/db.ts` at the first actual query, not during build-time import. `db/schema.sql` defines both domains and idempotent public starter posts.
+The connection pool is initialized lazily by `lib/db.ts` at the first actual query, not during build-time import. `db/schema.sql` defines both domains and idempotent public starter posts. The intended hosted database is Neon PostgreSQL; project identifiers and setup requirements are documented in `docs/NEON_SETUP.md`. The code currently uses `pg` in the Node.js runtime and expects `DATABASE_URL` from a private environment file or hosting environment.
+
+### Public templates and client work
+
+- `public/website-templates/` serves plain HTML/CSS previews that work without the Library database.
+- `website-templates/` holds the corresponding source and MIT notice for the original static templates.
+- `projects/client-work/heru-bali-tour/` preserves the HERU BALI TOUR client delivery source; it is not covered by the public template license.

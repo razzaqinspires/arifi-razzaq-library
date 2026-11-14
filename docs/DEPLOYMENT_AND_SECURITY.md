@@ -4,12 +4,18 @@
 
 1. Push the project to a Git repository and import it as a Next.js application.
 2. Provision PostgreSQL reachable from the deployment.
-3. Configure `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, and `NEXT_PUBLIC_SITE_URL` as server environment variables.
+3. Configure `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, and `NEXT_PUBLIC_SITE_URL` as server environment variables. For Neon on Vercel, use the pooled URI and keep database-backed route handlers on the Node.js runtime.
 4. Execute `db/schema.sql` once through the provider SQL console, or run `npm run db:setup` from a trusted environment with database access.
 5. For an existing database, back it up and run `npm run db:setup` to add the `posts` and `post_comments` tables and starter content.
 6. Deploy and validate the checklist in `QA_AND_CHANGELOG.md`.
 
 Do not use deployment filesystem as permanent file storage. Store binaries on Cloudflare R2 or another S3-compatible provider and put the public/signed file URL in each release.
+
+## Neon connection and deployment record
+
+The designated Neon project and its console URL are documented in `NEON_SETUP.md`. The current code uses `pg` and a lazy `Pool` for Next.js Node.js route handlers. Neon CLI authentication and provisioning have to be completed with an authorized Neon account. Do not store the resulting `DATABASE_URL` in tracked source. `.env` and `.env.local` are ignored by Git. See `NEON_SETUP.md` for the setup command, schema application, and explicit end-to-end checklist.
+
+The public infrastructure section links to the Neon Console because the project owner requested that reference. The console URL itself is not a credential; never publish a connection string or password.
 
 ## Current security controls
 

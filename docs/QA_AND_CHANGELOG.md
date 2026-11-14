@@ -1,5 +1,47 @@
 # QA and changelog
 
+## v0.4.0 — 2026-11-14
+
+### Changes
+
+- Added public portfolio, project status labels, website service consultation CTA, static starter template catalogue, and an infrastructure overview.
+- Added Company Profile and Product Landing static HTML/CSS starters plus an offline catalogue index.
+- Preserved HERU BALI TOUR project source and recorded its supplied public deployment URL.
+- Added Neon setup script (with `npx` fallback) and operational documentation for the specified project and `production` branch.
+- Added worklog and portfolio documentation plus agent operating rules.
+- Extended seed posts for HERU BALI TOUR and WHISKAY-BOT work records.
+- Updated `db:setup` to load `.env` and `.env.local` if present; tightened Git ignore rules for environment secrets and local deployment state.
+
+### Verification status at packaging
+
+- Source and documentation edits were inspected.
+- Python's standard HTML parser accepted the template catalogue, both starter template pages, and the stored HERU BALI TOUR page.
+- `package.json` parsed successfully as JSON.
+- `node --check` passed for the database setup script and the HERU BALI TOUR client booking script.
+- TypeScript transpile syntax checks passed for the updated TSX files (`app/page.tsx`, `app/layout.tsx`, `components/business-showcase.tsx`, `components/site-header.tsx`, `components/site-footer.tsx`) with zero syntax diagnostics.
+- `bash -n scripts/setup-neon.sh` passed with no syntax errors.
+- `npm install --ignore-scripts --no-audit --no-fund --fetch-retries=0 --fetch-timeout=15000` failed with `EAI_AGAIN registry.npmjs.org`; dependencies and a lockfile could not be downloaded in this environment.
+- A global TypeScript 5.8.3 `tsc --noEmit` attempt did not complete because `next`, `react`, `pg`, and Node type declarations were unavailable without installed dependencies. This is not a pass.
+- ESLint, complete dependency-backed typecheck, production build, local browser smoke test, PostgreSQL connection, Neon service provisioning, Vercel environment setup, and live deployment remain unverified. The connected Vercel account context returned no accessible teams/projects in this session, so no deployment was attempted.
+- Neon authentication is interactive and requires an authorized account session; project metadata and the setup script are recorded but provisioning is not claimed as complete.
+
+### Next verification commands
+
+```bash
+npm install
+npm run lint
+npm run typecheck
+npm run build
+npm run db:setup
+npm start
+```
+
+After `npm start`, verify homepage sections, `/website-templates/index.html` and both starter previews under `/website-templates/`, public API routes, and database-backed CRUD flows. Test Neon Auth, AI Gateway, Object Storage, Functions, and Realtime only after the corresponding feature wiring is implemented.
+
+---
+
+# QA and changelog
+
 ## v0.3.0 — Public Worklog & Community Posts — 2026-11-12
 
 ### Implemented

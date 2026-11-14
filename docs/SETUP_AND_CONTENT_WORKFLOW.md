@@ -30,3 +30,14 @@ Run `npm run db:setup` after backing up an existing database. New posts tables a
 ## Publication safety
 
 Review `PUBLICATION_GUIDELINES.md` before publishing. In particular, do not publish private costs, credentials, tokens, personal data, client data, proprietary game binaries, or third-party content without redistribution rights.
+
+
+## Portfolio and client-work updates
+
+For each new client website, add a portfolio record with project name, scope, status, verified public URL, handover date, and a short description. Keep sample data clearly labelled. Store the complete source in the appropriate client-work folder and keep it separate from reusable open templates.
+
+Website service inquiries are directed to Razzaq Ventures WhatsApp `+62 831-9390-5842`. Starter website templates are stored under `website-templates/` and published through `public/website-templates/`.
+
+## Infrastructure worklog
+
+Record provider, project reference, branch, setup state, environment-variable names (never their secret values), migration result, tests, and deployment result. Neon-specific setup instructions are in `docs/NEON_SETUP.md`.

@@ -12,6 +12,8 @@ export function SiteHeader() {
           <Link href="/#library">Library</Link>
           <Link href="/#worklog">Rekam Kerja</Link>
           <Link href="/#community">Komunitas</Link>
+          <Link href="/#portfolio">Portofolio</Link>
+          <Link href="/#website-service">Jasa Website</Link>
         </nav>
         <Link className="nav-admin" href="/admin">Studio <span>↗</span></Link>
       </div>

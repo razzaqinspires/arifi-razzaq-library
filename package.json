@@ -1,6 +1,6 @@
 {
   "name": "arifi-razzaq-creator-library",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "engines": {
     "node": ">=22.16.0"
@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "db:setup": "node --env-file=.env scripts/setup-db.mjs"
+    "db:setup": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/setup-db.mjs",
+    "neon:setup": "bash scripts/setup-neon.sh",
+    "neon:status": "neon status"
   },
   "dependencies": {
     "next": "16.4.5",

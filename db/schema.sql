@@ -230,3 +230,59 @@ Bagaimana cara memastikan mod tidak ikut menyertakan aset atau binary yang tidak
     'community', 'Diskusi Teknologi', ARRAY['game modding','patch','community','licensing'], FALSE, TRUE
   )
 ON CONFLICT (slug) DO NOTHING;
+
+-- 2026-11-14 portfolio and delivery worklog entries.
+INSERT INTO posts (title, slug, excerpt, content, kind, category, tags, external_url, featured, published)
+VALUES
+  (
+    'HERU BALI TOUR: website client pertama yang dipublikasikan',
+    'heru-bali-tour-website-client-delivery',
+    'Mendokumentasikan pengembangan dan publikasi website HERU BALI TOUR sebagai proyek website Razzaq Ventures.',
+    'HERU BALI TOUR menjadi salah satu rekam jejak website Razzaq Ventures. Website dipublikasikan pada alamat https://heru-bali-tour-website.vercel.app/ dan dirancang dengan identitas visual mandiri berdasarkan kebutuhan katalog tour dan transport.
+
+Ruang lingkup yang tercatat mencakup landing page responsif, katalog armada dengan filter kategori, formulir permintaan booking yang menyiapkan pesan WhatsApp, informasi layanan, FAQ, dan kontak. Nomor WhatsApp yang diberikan klien adalah 082322589437.
+
+Konten armada, foto, harga, ketersediaan, serta klaim layanan masih harus dikonfirmasi oleh klien sebelum dianggap sebagai informasi operasional resmi. Versi website yang dipublikasikan merupakan bukti adanya website live, bukan bukti sistem reservasi backend atau pembayaran online.',
+    'journal', 'Web Development', ARRAY['heru bali tour','website','client work','vercel','portfolio'],
+    'https://heru-bali-tour-website.vercel.app/', TRUE, TRUE
+  ),
+  (
+    'WHISKAY-BOT: rekam pengembangan otomasi WhatsApp modular',
+    'whiskay-bot-modular-whatsapp-automation',
+    'Dokumentasi proyek otomasi WhatsApp berbasis Node.js dan Baileys dengan arsitektur plugin.',
+    'WHISKAY-BOT merupakan proyek software untuk mempelajari dan membangun sistem otomasi WhatsApp yang modular. Stack yang tercatat menggunakan Node.js, Baileys, dan arsitektur plugin ES Modules.
+
+Fokus pengembangan meliputi command handler, plugin discovery, pengelolaan fitur, validasi, penanganan error, dan dokumentasi. Proyek ini berstatus pengembangan; tidak ada URL layanan produksi yang diklaim melalui catatan ini.
+
+Repository reference: https://github.com/razzaqinspires/whiskay-bot. Jangan menaruh session WhatsApp, token, kredensial, atau konfigurasi privat dalam rilis publik.',
+    'journal', 'Bot & Automation', ARRAY['whiskay-bot','nodejs','baileys','automation','plugin architecture'],
+    'https://github.com/razzaqinspires/whiskay-bot', FALSE, TRUE
+  ),
+  (
+    'Arifi Razzaq Library: portfolio, template website, dan konsultasi digital',
+    'arifi-razzaq-library-portfolio-and-website-services',
+    'Pembaruan Library agar berfungsi sebagai pusat karya, rekam jejak, template website statis, dan konsultasi jasa website.',
+    'Arifi Razzaq Library dikembangkan sebagai pusat dokumentasi karya dan proses kerja Razzaq Ventures. Pembaruan ini menambahkan bagian portofolio proyek, jasa konsultasi website, katalog template, dan ringkasan infrastruktur.
+
+Template Company Profile dan Product Landing disediakan sebagai starter HTML/CSS yang dapat dibuka secara offline dan dimodifikasi. HERU BALI TOUR ditampilkan sebagai contoh website yang telah dipublikasikan, sementara template lain diberi label starter concept agar tidak disalahartikan sebagai proyek klien yang telah selesai.
+
+Konsultasi pengembangan website dapat dilakukan melalui WhatsApp Razzaq Ventures: +62 831-9390-5842.',
+    'announcement', 'Web Development', ARRAY['arifi razzaq library','razzaq ventures','website templates','portfolio','consulting'],
+    NULL, TRUE, TRUE
+  )
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO posts (title, slug, excerpt, content, kind, category, tags, featured, published)
+VALUES
+  (
+    'AISYAH × NEXORA: aplikasi asisten AI Android',
+    'aisyah-nexora-android-ai-assistant',
+    'Catatan pengembangan asisten AI Android dengan backend Node.js, PostgreSQL, identitas pengguna, memori, dan context engine.',
+    'AISYAH adalah persona asisten dalam proyek aplikasi AI yang didukung oleh Nexora sebagai sistem kecerdasan. Pengembangan software-first dimulai dari aplikasi Android berbasis Flutter dan backend Node.js.
+
+Ruang lingkup yang terdokumentasi mencakup Google Authentication, user identity, persistence memory, memory governance, context engine, serta integrasi PostgreSQL. Catatan status merujuk pada paket dan dokumentasi fase pengembangan yang telah disusun pada November 2026.
+
+Status proyek adalah pengembangan/prototype. Halaman ini tidak menyatakan robot humanoid fisik atau sistem produksi lengkap telah selesai. Setiap kemampuan harus diuji dan didokumentasikan berdasarkan implementasi aktual.',
+    'journal', 'AI & Eksperimen', ARRAY['aisyah','nexora','flutter','android','nodejs','postgresql','ai assistant'], FALSE, TRUE
+  )
+ON CONFLICT (slug) DO NOTHING;
